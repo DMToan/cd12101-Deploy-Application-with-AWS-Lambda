@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import jsonwebtoken from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger.mjs'
+import { getAuthorizedUserKey } from '../../auth/utils.mjs'
 
 const logger = createLogger('auth')
 
@@ -47,7 +48,11 @@ async function verifyToken(authHeader) {
   const jwt = jsonwebtoken.decode(token, { complete: true })
 
   // TODO: Implement token verification
-  return undefined;
+  const headerKID = jwt.header.kid;
+  let res = await Axios.get(jwksUrl);
+  const publicKey = await getAuthorizedUserKey(res.data.keys, headerKID);
+
+  return jsonwebtoken.verify(token, publicKey, { algorithms: ['RS256'] });
 }
 
 function getToken(authHeader) {
