@@ -25,6 +25,7 @@
     "serverless-iam-roles-per-function": "^3.2.0",
     "uuid": "^9.0.1",
     "winston": "^3.15.0",
-    "middy": "^0.24.0"
+    "middy": "^0.24.0",
+    "serverless-webpack": "^5.7.1"
   }
 }
