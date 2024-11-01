@@ -1,7 +1,7 @@
 import Axios from 'axios'
 import jsonwebtoken from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger.mjs'
-import { getAuthorizedUserKey } from '../../auth/utils.mjs'
+import { getAuthorizedUserKey } from '../../auth/utils'
 
 const logger = createLogger('auth')
 
