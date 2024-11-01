@@ -1,9 +1,8 @@
-org: toandm7
+org: toanfit
 app: serverless-todo-app
 service: serverless-todo-app
 
 plugins:
-  - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
   - serverless-aws-documentation
@@ -38,6 +37,11 @@ provider:
           Action:
             - xray:PutTelemetryRecords
             - xray:PutTraceSegments
+            - "lambda:InvokeFunction"
+            - "cloudwatch:*"
+            - "logs:*"
+            - "apigateway:*"
+            - "iam:PassRole"
           Resource: "*"
 
   custom:
@@ -241,19 +245,22 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+        PublicAccessBlockConfiguration:
+            BlockPublicPolicy: false
         CorsConfiguration:
           CorsRules:
-            - AllowedHeaders:
-                - "*"
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
               AllowedMethods:
                 - GET
                 - PUT
                 - POST
                 - DELETE
                 - HEAD
-              AllowedOrigins:
-                - "*"
-
+              MaxAge: 3000
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -264,6 +271,7 @@ resources:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow
               Principal: "*"
-              Action: "s3:GetObject"
+              Action:
+                - "s3:GetObject"
               Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
         Bucket: !Ref AttachmentsBucket
