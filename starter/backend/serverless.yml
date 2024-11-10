@@ -11,11 +11,11 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   lambdaHashingVersion: "20201221"
 
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  region: ${opt:region, 'us-west-2'}
 
   tracing:
     lambda: true
@@ -24,7 +24,7 @@ provider:
   environment:
     TODOS_TABLE: my-todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: my-268379069136-todo-bucket
+    ATTACHMENT_S3_BUCKET: my-268379069136-bucket
     SIGNED_URL_EXPIRATION: 300
 
   logs:
