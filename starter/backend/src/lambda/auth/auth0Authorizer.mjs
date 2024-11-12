@@ -5,7 +5,7 @@ import { getAuthorizedUserKey } from '../../auth/utils'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-bfo85c74o2ld5ssw.us.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {

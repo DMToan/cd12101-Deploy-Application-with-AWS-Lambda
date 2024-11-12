@@ -44,7 +44,7 @@ provider:
             - "iam:PassRole"
           Resource: "*"
 
-  custom:
+custom:
   documentation:
     api:
       info:
@@ -64,7 +64,6 @@ functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # TODO: Configure this function
   GetTodos:
     handler: src/lambda/http/getTodos.handler
     events:
@@ -93,7 +92,6 @@ functions:
         Resource:
           - "*"
 
-  # TODO: Configure this function
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -107,9 +105,6 @@ functions:
             description: Create a new todo
             requestModels:
               "application/json": CreateTodoRequest
-          request:
-            schemas:
-              application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -118,11 +113,10 @@ functions:
       - Effect: Allow
         Action:
           - xray:PutTraceSegments
-          - - xray:PutTelemetryRecords
+          - xray:PutTelemetryRecords
         Resource:
           - "*"
 
-  # TODO: Configure this function
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
@@ -136,9 +130,6 @@ functions:
             description: Update todo
             requestModels:
               "application/json": UpdateTodoRequest
-          request:
-            schemas:
-              application/json: ${file(models/update-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -152,7 +143,6 @@ functions:
         Resource:
           - "*"
 
-  # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
@@ -174,7 +164,6 @@ functions:
         Resource:
           - "*"
 
-  # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
@@ -202,7 +191,6 @@ functions:
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -246,11 +234,10 @@ resources:
       Properties:
         BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
         PublicAccessBlockConfiguration:
-            BlockPublicPolicy: false
+          BlockPublicPolicy: false
         CorsConfiguration:
           CorsRules:
-            -
-              AllowedOrigins:
+            - AllowedOrigins:
                 - '*'
               AllowedHeaders:
                 - '*'
