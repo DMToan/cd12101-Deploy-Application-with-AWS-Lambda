@@ -9,6 +9,7 @@ export async function getTodos(idToken) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${idToken}`
+
       }
     }
   )

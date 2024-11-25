@@ -1,29 +1,60 @@
-import 'source-map-support/register'
-import * as middy from 'middy'
-import { cors, httpErrorHandler } from 'middy/middlewares'
+import 'source-map-support/register.js'
+import middy from '@middy/core'
+import cors from '@middy/http-cors'
+import httpErrorHandler from '@middy/http-error-handler'
+import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
+import { getUserId } from '../utils.js'
 
-import { updateTodo } from '../../helpers/todos'
-import { getUserId } from '../utils'
+const dynamodbClient = DynamoDBDocument.from(new DynamoDB())
 
-export const handler = middy(
-  async (event) => {
-    const todoId = event.pathParameters.todoId
-    const updatedTodo = JSON.parse(event.body)
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-    const userId = getUserId(event);
-    await updateTodo(userId, todoId, updatedTodo);
+const todoTable = process.env.TODOS_TABLE
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({})
-    }
-  }
-)
-
-handler
+export const handler = middy()
   .use(httpErrorHandler())
-  .use(
-    cors({
-      credentials: true
+  .use(cors({
+    credentials: true
+  }))
+  .handler(async (event) => {
+    try {
+      const todoId = event.pathParameters.todoId
+      const updatedTodo = JSON.parse(event.body)
+      // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+      const userId = getUserId(event);
+      await dynamodbClient.update({
+        TableName: todoTable,
+        Key: {
+            todoId,
+            userId
+        },
+        UpdateExpression: "set #name = :name, #dueDate = :dueDate, #done = :done",
+        ExpressionAttributeNames: {
+            "#name": "name",
+            "#dueDate": "dueDate",
+            "#done": "done"
+        },
+        ExpressionAttributeValues: {
+            ":name": updatedTodo.name,
+            ":dueDate": updatedTodo.dueDate,
+            ":done": updatedTodo.done
+        }
     })
-  )
+      return {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+        statusCode: 204,
+        body: JSON.stringify({ item: updatedTodo })
+      }
+    } catch (e) {
+      return {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+        },
+        statusCode: 500,
+        body: JSON.stringify({ error: e }),
+      };
+    }
+  })
