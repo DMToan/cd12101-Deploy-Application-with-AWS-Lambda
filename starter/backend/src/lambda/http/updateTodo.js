@@ -2,13 +2,8 @@ import 'source-map-support/register.js'
 import middy from '@middy/core'
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { getUserId } from '../utils.js'
-
-const dynamodbClient = DynamoDBDocument.from(new DynamoDB())
-
-const todoTable = process.env.TODOS_TABLE
+import { UpdateTodo } from '../../businessLogic/todos.js'
 
 export const handler = middy()
   .use(httpErrorHandler())
@@ -21,24 +16,7 @@ export const handler = middy()
       const updatedTodo = JSON.parse(event.body)
       // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
       const userId = getUserId(event);
-      await dynamodbClient.update({
-        TableName: todoTable,
-        Key: {
-            todoId,
-            userId
-        },
-        UpdateExpression: "set #name = :name, #dueDate = :dueDate, #done = :done",
-        ExpressionAttributeNames: {
-            "#name": "name",
-            "#dueDate": "dueDate",
-            "#done": "done"
-        },
-        ExpressionAttributeValues: {
-            ":name": updatedTodo.name,
-            ":dueDate": updatedTodo.dueDate,
-            ":done": updatedTodo.done
-        }
-    })
+      await UpdateTodo(todoId, updatedTodo, userId)
       return {
         headers: {
           "Access-Control-Allow-Origin": "*",

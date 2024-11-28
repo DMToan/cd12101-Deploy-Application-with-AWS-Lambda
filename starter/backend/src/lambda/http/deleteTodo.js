@@ -2,14 +2,8 @@ import 'source-map-support/register.js';
 import middy from '@middy/core'
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { getUserId } from '../utils.js'
-
-const dynamodbClient = DynamoDBDocument.from(new DynamoDB())
-
-const todoTable = process.env.TODOS_TABLE
-
+import { DeleteTodo } from '../../businessLogic/todos.js';
 export const handler = middy()
   .use(httpErrorHandler())
   .use(cors({
@@ -20,13 +14,7 @@ export const handler = middy()
     // TODO: Remove a TODO item by id
     const userId = getUserId(event);
     try {
-      await dynamodbClient.delete({
-        TableName: todoTable,
-        Key: {
-            todoId,
-            userId
-        }
-    })
+      const result = await DeleteTodo(todoId, userId)
       
       return {
         statusCode: 200,
@@ -34,7 +22,7 @@ export const handler = middy()
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Credentials": true,
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({result: result})
       }
     } catch (e) {
       return {

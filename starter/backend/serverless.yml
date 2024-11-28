@@ -6,6 +6,7 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
   - serverless-aws-documentation
+  - serverless-reqvalidator-plugin
 
 frameworkVersion: '3'
 
@@ -37,12 +38,6 @@ provider:
           Action:
             - xray:PutTelemetryRecords
             - xray:PutTraceSegments
-            - "lambda:InvokeFunction"
-            - "cloudwatch:*"
-            - "logs:*"
-            - "apigateway:*"
-            - "dynamodb:*"
-            - "iam:PassRole"
           Resource: "*"
 
 custom:
@@ -106,6 +101,9 @@ functions:
             description: Create a new todo
             requestModels:
               "application/json": CreateTodoRequest
+          request:
+            schemas:
+              application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -131,6 +129,9 @@ functions:
             description: Update todo
             requestModels:
               "application/json": UpdateTodoRequest
+          request:
+            schemas:
+              application/json: ${file(models/update-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
