@@ -41,7 +41,7 @@ export async function DeleteTodo(todoId, userId) {
     return await deleteTodoItem(todoId, userId)
 }
 
-export async function createAttachmentPresignedUrl(todoId, userId, uploadUrl) {
+export async function createAttachmentPresignedUrl(todoId, userId) {
     logger.info("Call function createAttachmentPresignedUrl");
-    return await getUploadUrl(todoId, userId, uploadUrl)
+    return await getUploadUrl(todoId, userId)
 }
